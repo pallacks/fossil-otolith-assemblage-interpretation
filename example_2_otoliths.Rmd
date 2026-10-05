@@ -175,10 +175,6 @@ df_Gatun_clean <- df_Gatun %>%
 
 # Merge Gatun dataset with middle Holocene dataset
 df_combined <- rbind(df_Gatun_clean, df_HolCarib)
-
-# In Family column rename Scaridae by Labridae (as they are both in the family Labridae in example 1 dataset)
-#df_combined <- df_combined %>%
-#  mutate(family = ifelse(family == "Scaridae", "Labridae", family))
 ```
 
 Calculate fish trophic level for family using FishBase data
@@ -211,6 +207,14 @@ pooled_mean <- troph_family  %>%
 troph_family <- troph_family %>%
   mutate(mean_troph = ifelse(Family == "Labridae", pooled_mean, mean_troph)) %>%
   filter(Family != "Scaridae")
+
+# Replace Scaridae by Labridae in df_combined (as they are both in the family Labridae in Dillon et al. 2026 dataset)
+df_combined <- df_combined %>% 
+  mutate(family = ifelse(family == "Scaridae", "Labridae", family))
+
+# Delete Channidae row in troph_family (as it is not present in df_combined)
+df_combined <- df_combined %>%
+  filter(family != "Channidae")
 
 # Join troph_family with df_combined based on family column
 df_combined <- df_combined %>%
@@ -364,7 +368,7 @@ Fig5_C1 <- ggplot(plot_A_Hol, aes(x = age_group, y = mean_troph, fill = age_grou
   geom_point(aes(size = family_percentage_by_ageGroup), shape = 21, alpha = 1) +
   scale_size_area(name = "Abundance (%)", max_size = 8) +  
   geom_violin(alpha = 0.3, linewidth = 0.6, adjust = 2) +
-  coord_cartesian(ylim = c(2.5, 4.0)) +
+  coord_cartesian(ylim = c(2.0, 4.5)) +
   labs(y = "Mean TL",
        x = "",
        fill = "Palaeohabitat",
@@ -386,7 +390,7 @@ Fig5_C2 <- ggplot(plot_A_Mio, aes(x = age_group, y = mean_troph, fill = age_grou
   geom_point(aes(size = family_percentage_by_ageGroup), shape = 21, alpha = 1) +
   scale_size_area(name = "Abundance (%)", max_size = 8) +  
   geom_violin(alpha = 0.3, linewidth = 0.6, width = 0.4, adjust = 2) +
-  coord_cartesian(ylim = c(2.5, 4.0)) +
+  coord_cartesian(ylim = c(2.0, 4.5)) +
   labs(y = "Mean TL",
        x = "",
        fill = "Palaeohabitat",
